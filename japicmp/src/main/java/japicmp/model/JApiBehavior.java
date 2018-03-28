@@ -95,10 +95,20 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
 
 	private List<String> extractExceptions(Optional<? extends CtBehavior> methodOptional) {
 		if (methodOptional.isPresent()) {
-			ExceptionsAttribute exceptionsAttribute = methodOptional.get().getMethodInfo().getExceptionsAttribute();
+			ExceptionsAttribute exceptionsAttribute = null;
+			try {
+				exceptionsAttribute = methodOptional.get().getMethodInfo().getExceptionsAttribute();
+			} catch (NullPointerException ex) {
+				System.out.println("NPE Exception - " + methodOptional.get() + " - class: " + jApiClass.getFullyQualifiedName() );
+				return Collections.emptyList();
+			}
 			String[] exceptions;
 			if (exceptionsAttribute != null) {
 				exceptions = exceptionsAttribute.getExceptions();
+				if (exceptions == null) {
+					System.out.println("exceptions == null - " + exceptionsAttribute + " - methodOptional: " + methodOptional.get() + " - class: " + jApiClass.getFullyQualifiedName() );
+					exceptions = new String[0];
+				}
 			} else {
 				exceptions = new String[0];
 			}
